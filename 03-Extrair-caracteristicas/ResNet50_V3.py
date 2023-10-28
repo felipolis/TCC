@@ -1,0 +1,92 @@
+import os
+import cv2
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from tensorflow.keras.applications import ResNet50  # Importe a ResNet50 em vez da VGG16
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.preprocessing import image
+from skimage import feature
+from tensorflow.keras.applications.resnet50 import preprocess_input  # Importe a função de pré-processamento da ResNet50
+
+# Diretórios
+diretorio_imagens = '../data/patches/'
+diretorio_caracteristicas = '../data/caracteristicas/'
+arquivo_csv = '../data/caracteristicas/ResNet50.csv'  # Atualize o nome do arquivo CSV
+spectrogram_dir = "../data/espectogramas"
+
+# Constantes
+QUANT_CLASSES = 5
+
+# Encontre as classes mais comuns
+class_names = []
+class_count = {}
+
+for root, dirs, files in os.walk(spectrogram_dir):
+    for dir in dirs:
+        class_names.append(dir)
+
+for root, dirs, files in os.walk(spectrogram_dir):
+    for dir in dirs:
+        class_count[dir] = len(os.listdir(os.path.join(root, dir)))
+
+class_count = dict(sorted(class_count.items(), key=lambda item: item[1], reverse=True))
+classes = list(class_count.keys())[3:QUANT_CLASSES]
+print(f"Classes com mais imagens: {classes}")
+
+# Se o diretório não existir, cria
+if not os.path.exists(diretorio_caracteristicas):
+    os.makedirs(diretorio_caracteristicas)
+
+# Carregue o modelo ResNet50 com os parâmetros desejados
+resnet_model = ResNet50(weights='imagenet', include_top=False, pooling='avg', input_shape=(224, 224, 3))
+
+def extrair_caracteristicas_ResNet50(imagem):
+    # Redimensione a imagem para o tamanho esperado pelo modelo ResNet50
+    imagem = cv2.resize(imagem, (224, 224))
+    # Pré-processamento da imagem de acordo com as especificações da ResNet50
+    imagem = preprocess_input(imagem)
+    # Expanda as dimensões da imagem para corresponder ao input_shape do modelo
+    imagem = np.expand_dims(imagem, axis=0)
+    # Obtenha as características usando o modelo ResNet50
+    features = resnet_model.predict(imagem)
+    # Aplique flatten nas características
+    features = features.flatten()
+    return features
+
+# Inicialize um DataFrame vazio para armazenar as características ResNet50
+df = pd.DataFrame()
+
+# Percorra os diretórios da lista de classes
+for key in os.listdir(diretorio_imagens):
+    if key in classes:
+        key_path = os.path.join(diretorio_imagens, key)
+
+        # Percorra todas as imagens no diretório
+        for image_name in os.listdir(key_path):
+            image_path = os.path.join(key_path, image_name)
+            # Carregue a imagem
+            imagem = cv2.imread(image_path)
+            # Extraia as características da imagem
+            features = extrair_caracteristicas_ResNet50(imagem)
+            # Obtenha o nome do arquivo original
+            nome_arquivo_original = image_name.split('_')[0]
+            # Adicione as características ao DataFrame
+            data_to_append = pd.Series([key, nome_arquivo_original] + list(features))
+            df = pd.concat([df, data_to_append.to_frame().T], ignore_index=True)
+
+            print(f"Processando {image_path}")
+        
+        # Adiciona no arquivo CSV
+        df.to_csv(arquivo_csv, mode='a', header=False, index=False)
+        print(f"Adicionado no arquivo CSV {arquivo_csv}")
+
+        # Limpa o DataFrame
+        df = pd.DataFrame()
+
+# Defina os nomes das colunas no DataFrame
+colunas = ['key', 'nome_arquivo'] + [f'LBP_{i}' for i in range(len(features))]
+df.columns = colunas
+
+df.to_csv(arquivo_csv, mode='a', header=False, index=False)
