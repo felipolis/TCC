@@ -1,5 +1,7 @@
 # Trabalho de Conclusão de Curso
 
+Titulo: Classificação de Pássaros por Meio de Cantos e Chamados: Uma Abordagem Integrada com Espectrogramas em Conjunto com Descritores Handcrafted e Transfer Learning, Aplicada ao Support Vector Machine (SVM)
+
 Curso: Bacharelado em Ciência da Computação
 
 Universidade: Universidade Tecnologica Federal do Paraná
