@@ -4,6 +4,8 @@ Titulos provisorios:
   
   Classificação de Pássaros por Meio de Cantos e Chamados: Uma Abordagem Integrada com Descritores Handcrafted e Transfer Learning, em conjunto com dados geográficos, aplicada ao Support Vector Machine (SVM)
 
+  Classificação de cantos e chamados de pássaros usando espectrogramas com descritories handcrafted e transfer learning
+
 5-6
 8-9
 
