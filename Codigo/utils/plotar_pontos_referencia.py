@@ -85,11 +85,14 @@ def encontrar_classes_proximas(arquivo_csv, numero_minimo_amostras, N):
     # Plot each class point with a unique color
     for index, (class_name, highest_density_point) in enumerate(highest_density_points.items()):
         ax.scatter(highest_density_point[0], highest_density_point[1], color=colors[index % len(colors)], label=class_name)
-    # Plot the reference point
-    ax.scatter(reference_point[0], reference_point[1], color='red', label='Reference Point')
+    # Plot the reference point com um formato diferente
+    ax.scatter(reference_point[0], reference_point[1], color='red', marker='x', label='Ponto de referência', s=400)
     ax.legend()
     ax.get_legend().remove()
     plt.show()
+
+    # salvar imagem com fundo transparente
+    fig.savefig('referencia.png', transparent=True)
 
     return closest_classes
 

@@ -58,7 +58,11 @@ def encontrar_classes_proximas(arquivo_csv, numero_minimo_amostras, N):
         ax.scatter(sampled_points[:, 0], sampled_points[:, 1], color=unique_colors[idx], label=class_name)
 
     ax.legend()
+    ax.get_legend().remove()
     plt.show()
+
+    # salvar imagem com fundo transparente
+    #fig.savefig('geral.png', transparent=True)
 
 # Exemplo de uso da função
 encontrar_classes_proximas('../data/metadata.csv', 100, 10)
