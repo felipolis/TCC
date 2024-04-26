@@ -66,6 +66,7 @@ def encontrar_classes_proximas(arquivo_csv, numero_minimo_amostras, N):
     for class_name, class_data in grouped:
         highest_density_point = calcular_ponto_maior_densidade(class_data)
         highest_density_points[class_name] = highest_density_point
+        print("Classe:", class_name, "Ponto de maior densidade:", highest_density_point)
 
     # Encontrar o ponto de referência
     reference_point = calcular_ponto_referencia(highest_density_points)
